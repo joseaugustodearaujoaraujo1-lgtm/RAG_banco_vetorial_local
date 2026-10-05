@@ -15,7 +15,6 @@ const app = express()
 
 app.use(express.json())
 
-//TRNFORMANDOS PDFs EM TEXTOS
 async function TransformarPDFemTexo(pasta){
     try {
         const pastaComArquivos = await fs.readdir(pasta)
@@ -38,7 +37,6 @@ async function TransformarPDFemTexo(pasta){
     }
 }
 
-//FAZENDO CHUNCKS
 const textos = await TransformarPDFemTexo("documentos")
 const setChunck = new RecursiveCharacterTextSplitter({
     chunkSize: 1200, 
@@ -46,7 +44,6 @@ const setChunck = new RecursiveCharacterTextSplitter({
 })
 const chuncks = await setChunck.splitText(textos.join("\n"))
 
-//MODELOS DE EMBIDDINGS
 const modeloEmbiddings = new OpenAIEmbeddings({
     model: "nvidia/nemotron-3-embed-1b:free",
     apiKey: process.env.API_OPENROUTER,
@@ -58,7 +55,7 @@ const modeloEmbiddings = new OpenAIEmbeddings({
 const bancoVetorial = await MemoryVectorStore.fromTexts(chuncks , [] , modeloEmbiddings)
 const query = bancoVetorial.asRetriever({
     k: 1
-}) //configurando o formato de busca no banco vetorial
+}) 
 
 const modelosOpenrouter = new ChatOpenRouter({
     model: process.env.MODELO_OPENROUTER_1,
